@@ -1,0 +1,12 @@
+.local/
+dist/
+release/
+node_modules/
+*.log
+*.asar
+*.exe
+*.dll
+*.tgz
+*.zip
+.env*
+.DS_Store

@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import crypto from 'node:crypto';
+import {fileURLToPath} from 'node:url';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const upstream=['assets.js','show.js'].map(file=>fs.readFileSync(path.join(root,'vendor','dsh-550c-boot','src',file),'utf8')).join('\n');
+const wrapper=fs.readFileSync(path.join(root,'src','boot-wrapper.js'),'utf8');
+const script='/* dsh-550c-boot derivative, MIT. See LICENSE and NOTICE.md. */\n(() => {\n'+upstream+'\n'+wrapper+'\n})();\n';
+new vm.Script(script);
+const dist=path.join(root,'dist');fs.mkdirSync(dist,{recursive:true});fs.writeFileSync(path.join(dist,'boot.js'),script);
+const hash=crypto.createHash('sha256').update(script).digest('base64');
+const preview=`<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none';script-src 'sha256-${hash}';style-src 'unsafe-inline';img-src data:;font-src data:"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Codex 550C Boot Preview</title><style>html,body{margin:0;height:100%;background:#181818;color:#eee;font:18px Consolas,monospace}main{height:100%;display:grid;place-items:center}#codex-550c-boot{position:fixed;inset:0;background:#000;z-index:2147483647;transition:opacity .35s;animation:fail-open 0s 30s forwards}@keyframes fail-open{to{visibility:hidden;pointer-events:none}}</style></head><body><main>Preview complete. Reload to replay. This is a demo, not Codex.</main><div id="codex-550c-boot" aria-label="550C boot animation; click or Esc to skip"></div><script>${script}</script></body></html>`;
+fs.writeFileSync(path.join(dist,'preview.html'),preview);
+fs.writeFileSync(path.join(dist,'build.json'),JSON.stringify({scriptHash:hash,bytes:Buffer.byteLength(script),upstreamCommit:'1beaf93ca9ed74b0b2c6db3ee0f436a42437d062'},null,2)+'\n');
+console.log('Animation built from pinned vendored sources.');

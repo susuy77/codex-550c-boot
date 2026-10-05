@@ -1,0 +1,29 @@
+name: source-validation
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [22, 24]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm run build
+      - run: npm test
+      - run: npm run verify
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $found = @()
+          Get-ChildItem scripts/windows/*.ps1 | ForEach-Object {
+            $tokens = $null; $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+            $found += $errors
+          }
+          if ($found.Count) { throw 'PowerShell syntax check failed' }

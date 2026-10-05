@@ -1,0 +1,33 @@
+{
+  "name": "codex-550c-boot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Unofficial reversible 550C startup animation adapter for Codex on Windows",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node tools/build-animation.mjs",
+    "test": "node --test test/*.test.mjs",
+    "preview": "node tools/preview.mjs",
+    "verify": "node tools/audit-release.mjs",
+    "release": "node tools/package-release.mjs"
+  },
+  "files": [
+    "src",
+    "tools",
+    "scripts",
+    "vendor",
+    "dist",
+    "docs",
+    "test",
+    "*.cmd",
+    "*.md",
+    "LICENSE",
+    ".github",
+    ".gitignore",
+    "package.json"
+  ]
+}
